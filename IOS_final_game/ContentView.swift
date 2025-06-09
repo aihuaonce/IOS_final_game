@@ -24,8 +24,9 @@ struct ContentView: View {
                     .fontWeight(.bold)
                     .foregroundColor(.blue)
                     .padding(.bottom, 50)
+
                 // 瓶子按鈕
-                NavigationLink(destination: BottleChoose()) {
+                NavigationLink(destination: BottleChoose()) { // <-- 保留組員的跳轉目標
                     Text("瓶子")
                         .font(.title2)
                         .fontWeight(.semibold)
@@ -44,7 +45,7 @@ struct ContentView: View {
                 .padding(.bottom, 20)
 
                 // 房子按鈕
-                NavigationLink(destination: PeopleChoose()) {
+                NavigationLink(destination: PeopleChoose()) { // <-- 保留組員的跳轉目標
                     Text("房子")
                         .font(.title2)
                         .fontWeight(.semibold)
