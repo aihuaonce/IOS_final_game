@@ -15,36 +15,34 @@ struct GuessResult {
 
 // GameManager 負責遊戲的狀態和核心邏輯
 class GameManager: ObservableObject {
-    @Published var secretSequence: [CupColor] // 目標杯子顏色序列（秘密數字）
-    @Published var playerSequence: [CupColor] // 玩家當前操作的杯子序列
+    @Published var secretSequence: [CupColor]
+    @Published var playerSequence: [CupColor]
 
-    private let numberOfCups: Int // 遊戲的杯子總數 (難度)
+    private let numberOfValue: Int // 將 numberOfCups 更名為 numberOfValue，以符合上下文
 
-    init(numberOfCups: Int) {
-        self.numberOfCups = numberOfCups
-        // 確保至少有 4 個杯子用於幾A幾B的4位數
-        let actualNumberOfCups = max(4, numberOfCups)
+    // 修改 init 參數名稱以匹配
+    init(numberOfValue: Int) {
+        self.numberOfValue = numberOfValue // 現在 numberOfValue 就是遊戲的位數
+
+        // 確保從 CupColor 中至少有足夠的顏色可以用來生成序列
+        let availableColors = Array(CupColor.allCases.prefix(numberOfValue))
         
-        // 1. 生成秘密序列
-        // 假設秘密數字是 4 位數，且數字不能重複
-        // 我們從 CupColor 的所有案例中選擇前 actualNumberOfCups 個顏色
-        var allPossibleColors = Array(CupColor.allCases.prefix(actualNumberOfCups))
-        allPossibleColors.shuffle() // 打亂所有可能顏色的順序
+        guard availableColors.count >= numberOfValue else {
+            fatalError("CupColor 的數量不足以支援選擇的難度 \(numberOfValue)")
+        }
 
-        // 取前 4 個作為秘密序列 (如果你的幾A幾B是4位數)
-        // 你可以根據遊戲規則調整這個「秘密數字」的位數
-        self.secretSequence = Array(allPossibleColors.prefix(4))
+        // 生成秘密序列，長度就是 numberOfValue
+        var tempColors = availableColors.shuffled()
+        self.secretSequence = Array(tempColors.prefix(numberOfValue))
         
-        // 2. 生成玩家序列 (打亂的初始序列)
-        var initialPlayerColors = Array(allPossibleColors.prefix(4)) // 確保位數和秘密序列一致
-        initialPlayerColors.shuffle() // 打亂玩家序列
-        self.playerSequence = initialPlayerColors
+        // 生成玩家初始序列，長度也是 numberOfValue
+        var initialPlayerColors = tempColors.shuffled() // 再次打亂，確保和秘密序列不同
+        self.playerSequence = Array(initialPlayerColors.prefix(numberOfValue))
 
-        print("秘密序列: \(secretSequence.map { $0.rawValue })")
-        print("玩家初始序列: \(playerSequence.map { $0.rawValue })")
+        print("秘密序列 (位數: \(numberOfValue)): \(secretSequence.map { $0.rawValue })")
+        print("玩家初始序列 (位數: \(numberOfValue)): \(playerSequence.map { $0.rawValue })")
     }
 
-    // MARK: - 玩家操作
     func swapCups(index1: Int, index2: Int) {
         guard index1 >= 0 && index1 < playerSequence.count,
               index2 >= 0 && index2 < playerSequence.count,
@@ -56,30 +54,26 @@ class GameManager: ObservableObject {
         print("交換後玩家序列: \(playerSequence.map { $0.rawValue })")
     }
 
-    // MARK: - 檢查 A B 結果
     func checkGuess() -> GuessResult {
         var aCount = 0
         var bCount = 0
 
-        // 建立一個秘密序列的副本，方便檢查 B 時排除已匹配的 A
         var secretTemp = secretSequence.map { $0.rawValue }
         var playerTemp = playerSequence.map { $0.rawValue }
 
-        // 檢查 A
         for i in 0..<playerSequence.count {
             if playerTemp[i] == secretTemp[i] {
                 aCount += 1
-                playerTemp[i] = "MATCHED_A" // 標記為已匹配
-                secretTemp[i] = "MATCHED_A" // 標記為已匹配
+                playerTemp[i] = "MATCHED_A"
+                secretTemp[i] = "MATCHED_A"
             }
         }
 
-        // 檢查 B
         for i in 0..<playerSequence.count {
-            if playerTemp[i] != "MATCHED_A" { // 如果這個數字還沒有被 A 匹配
+            if playerTemp[i] != "MATCHED_A" {
                 if let secretIndex = secretTemp.firstIndex(of: playerTemp[i]) {
                     bCount += 1
-                    secretTemp[secretIndex] = "MATCHED_B" // 標記為已匹配
+                    secretTemp[secretIndex] = "MATCHED_B"
                 }
             }
         }
