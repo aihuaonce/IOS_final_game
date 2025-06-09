@@ -26,16 +26,7 @@ struct ContentView: View {
                     .padding(.bottom, 50)
 
                 // 瓶子按鈕
-                NavigationLink(destination:
-                    VStack { // 將 Text 包裹在 VStack 中
-                        Text("瓶子遊戲難度選擇頁面")
-                            .font(.title)
-                            .padding()
-                        // 在這裡可以添加你的瓶子遊戲難度選擇 UI
-                    }
-                    .navigationBarBackButtonHidden(true) // <-- 應用修飾符到這個 VStack
-                    .navigationTitle("") // 也可以在這裡清空標題，讓 NavigationBar 空間更簡潔
-                ) {
+                NavigationLink(destination: BottleChoose()) { // <-- 保留組員的跳轉目標
                     Text("瓶子")
                         .font(.title2)
                         .fontWeight(.semibold)
@@ -54,16 +45,7 @@ struct ContentView: View {
                 .padding(.bottom, 20)
 
                 // 房子按鈕
-                NavigationLink(destination:
-                    VStack { // 將 Text 包裹在 VStack 中
-                        Text("房子遊戲難度選擇頁面")
-                            .font(.title)
-                            .padding()
-                        // 在這裡可以添加你的房子遊戲難度選擇 UI
-                    }
-                    .navigationBarBackButtonHidden(true) // <-- 應用修飾符到這個 VStack
-                    .navigationTitle("") // 也可以在這裡清空標題
-                ) {
+                NavigationLink(destination: PeopleChoose()) { // <-- 保留組員的跳轉目標
                     Text("房子")
                         .font(.title2)
                         .fontWeight(.semibold)

@@ -37,60 +37,49 @@ struct BottleGameView: View {
     @State private var gameMessage: String = "請交換方塊來猜測順序。"
     @State private var hasGuessed: Bool = false
     @State private var correctSequenceForHeader: [CupColor]? = nil
-
+    
+    @State private var showGameOverScreen: Bool = false
+    
+    
     init(numberOfCups: Int) {
         self.numberOfCups = numberOfCups
         _gameManager = StateObject(wrappedValue: GameManager(numberOfValue: numberOfCups))
     }
     
     var body: some View {
-        VStack(spacing: 0) {
-            // MARK: - 使用 GameHeaderView 來替換上半部複雜的 View 結構
-            GameHeaderView(gameMessage: $gameMessage, correctSequenceToDisplay: correctSequenceForHeader)
-
-            // MARK: - 分隔線 (模擬木板)
-            Rectangle()
-                .fill(Color.brown)
-                .frame(height: 10)
-                .overlay(
-                    Rectangle()
-                        .stroke(Color.black.opacity(0.3), lineWidth: 1)
-                )
-            
-            // MARK: - 下半部：杯子排列區
-            VStack {
-                Text("你的順序")
-                    .font(.largeTitle)
-                    .padding(.bottom, 30)
-                    .padding(.top, 20)
+        ZStack {
+            VStack(spacing: 0) {
+                // MARK: - 使用 GameHeaderView 來替換上半部複雜的 View 結構
+                GameHeaderView(gameMessage: $gameMessage, correctSequenceToDisplay: correctSequenceForHeader)
                 
-                Spacer()
+                // MARK: - 分隔線 (模擬木板)
+                Rectangle()
+                    .fill(Color.brown)
+                    .frame(height: 10)
+                    .overlay(
+                        Rectangle()
+                            .stroke(Color.black.opacity(0.3), lineWidth: 1)
+                    )
                 
-                let totalCups = gameManager.playerSequence.count
-                let firstRowItemCount = (totalCups + 1) / 2
-                
-                let firstRowCups = Array(gameManager.playerSequence.prefix(firstRowItemCount))
-                let secondRowCups = Array(gameManager.playerSequence.suffix(max(0, totalCups - firstRowItemCount)))
-                
-                HStack(spacing: 15) {
-                    ForEach(firstRowCups.indices, id: \.self) { indexInRow in
-                        let actualIndex = indexInRow
-                        CupView(color: firstRowCups[indexInRow],
-                                isTarget: false,
-                                isSelected: self.firstSelectedIndex == actualIndex)
-                        .onTapGesture {
-                            self.handleCupTap(at: actualIndex)
-                        }
-                    }
-                }
-                .padding(.horizontal)
-                .padding(.bottom, !secondRowCups.isEmpty ? 5 : 0)
-                
-                if !secondRowCups.isEmpty {
+                // MARK: - 下半部：杯子排列區
+                VStack {
+                    Text("你的順序")
+                        .font(.largeTitle)
+                        .padding(.bottom, 30)
+                        .padding(.top, 20)
+                    
+                    Spacer()
+                    
+                    let totalCups = gameManager.playerSequence.count
+                    let firstRowItemCount = (totalCups + 1) / 2
+                    
+                    let firstRowCups = Array(gameManager.playerSequence.prefix(firstRowItemCount))
+                    let secondRowCups = Array(gameManager.playerSequence.suffix(max(0, totalCups - firstRowItemCount)))
+                    
                     HStack(spacing: 15) {
-                        ForEach(secondRowCups.indices, id: \.self) { indexInRow in
-                            let actualIndex = indexInRow + firstRowItemCount
-                            CupView(color: secondRowCups[indexInRow],
+                        ForEach(firstRowCups.indices, id: \.self) { indexInRow in
+                            let actualIndex = indexInRow
+                            CupView(color: firstRowCups[indexInRow],
                                     isTarget: false,
                                     isSelected: self.firstSelectedIndex == actualIndex)
                             .onTapGesture {
@@ -99,19 +88,44 @@ struct BottleGameView: View {
                         }
                     }
                     .padding(.horizontal)
+                    .padding(.bottom, !secondRowCups.isEmpty ? 5 : 0)
+                    
+                    if !secondRowCups.isEmpty {
+                        HStack(spacing: 15) {
+                            ForEach(secondRowCups.indices, id: \.self) { indexInRow in
+                                let actualIndex = indexInRow + firstRowItemCount
+                                CupView(color: secondRowCups[indexInRow],
+                                        isTarget: false,
+                                        isSelected: self.firstSelectedIndex == actualIndex)
+                                .onTapGesture {
+                                    self.handleCupTap(at: actualIndex)
+                                }
+                            }
+                        }
+                        .padding(.horizontal)
+                    }
+                    
+                    Spacer()
                 }
-                
-                Spacer()
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .background(Color.green.opacity(0.2))
             }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .background(Color.green.opacity(0.2))
+            .navigationTitle("幾 A 幾 B 遊戲")
+            .navigationBarTitleDisplayMode(.inline)
+            // MARK: - 遊戲結束畫面疊加在最上層
+            if showGameOverScreen {
+                GameOverView()
+                    .transition(.opacity)
+            }
         }
-        .navigationTitle("幾 A 幾 B 遊戲")
-        .navigationBarTitleDisplayMode(.inline)
     }
     
     // MARK: - handleCupTap
     private func handleCupTap(at index: Int) {
+        if showGameOverScreen {
+                   return
+               }
+        
         if firstSelectedIndex == nil {
             firstSelectedIndex = index
         } else if firstSelectedIndex == index {
@@ -132,17 +146,22 @@ struct BottleGameView: View {
                 
                 withAnimation(.easeInOut(duration: 0.5)) {
                     self.correctSequenceForHeader = gameManager.secretSequence
+                    
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                        withAnimation {
+                            self.showGameOverScreen = true
+                        }
+                    }
                 }
             }
-            
         }
     }
 }
 
 struct BottleGameView_Previews: PreviewProvider {
     static var previews: some View {
-        Group {
-            BottleGameView(numberOfCups: 6)
+        NavigationStack {
+            BottleGameView(numberOfCups: 4)
         }
     }
 }
