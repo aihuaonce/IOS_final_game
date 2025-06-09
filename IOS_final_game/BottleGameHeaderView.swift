@@ -84,7 +84,6 @@ struct GameHeaderView: View {
                 .padding(.vertical, 10) // 整個杯子區塊的上下內邊距
                 .background(Color.yellow.opacity(0.2)) // 給杯子區塊一個淺色背景以作區隔
                 .cornerRadius(10) // 圓角
-                .shadow(radius: 2) // 陰影
                 .padding(.horizontal) // 讓整個杯子區塊左右留白
                 .transition(.opacity) // 淡入淡出動畫
                 .animation(.easeInOut(duration: 0.5), value: sequence.count) // 當序列改變時觸發動畫
