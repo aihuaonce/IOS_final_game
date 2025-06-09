@@ -213,6 +213,7 @@ class GameScene: SKScene {
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
             self.$showPeopleGameOverScreen.wrappedValue = true
         }
+        
     }
     
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {

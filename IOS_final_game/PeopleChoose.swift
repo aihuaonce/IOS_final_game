@@ -13,13 +13,13 @@ struct PeopleChoose: View {
                 Text("選擇難度")
                     .font(.largeTitle)
                     .bold()
-
+                
                 ForEach(PeopleGameDifficulty.allCases, id: \.self) { difficulty in
                     NavigationLink(destination:
-                        PeopleTimeChoose()
-                            .onAppear {
-                                GameSettings.shared.difficulty = difficulty
-                            }
+                                    PeopleTimeChoose()
+                        .onAppear {
+                            GameSettings.shared.difficulty = difficulty
+                        }
                     ) {
                         Text(difficulty.displayName)
                             .font(.title2)
@@ -30,8 +30,9 @@ struct PeopleChoose: View {
                             .cornerRadius(10)
                     }
                 }
-
+                
                 Spacer()
+                    .navigationBarBackButtonHidden(true)
             }
             .padding()
         }
@@ -43,7 +44,7 @@ enum PeopleGameDifficulty: String, CaseIterable {
     case easy
     case medium
     case hard
-
+    
     var displayName: String {
         switch self {
         case .easy: return "菜就多練"
@@ -51,7 +52,7 @@ enum PeopleGameDifficulty: String, CaseIterable {
         case .hard: return "死"
         }
     }
-
+    
     var color: Color {
         switch self {
         case .easy: return .green

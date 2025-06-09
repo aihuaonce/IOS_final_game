@@ -85,6 +85,7 @@ struct BottleChoose: View {
             }
             .navigationTitle("")
             .navigationBarHidden(true)
+            .navigationBarBackButtonHidden(true)
         }
     }
 }

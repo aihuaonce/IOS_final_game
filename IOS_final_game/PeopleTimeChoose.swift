@@ -31,6 +31,7 @@ struct PeopleTimeChoose: View {
             }
 
             Spacer()
+                .navigationBarBackButtonHidden(true)
         }
         .padding()
     }

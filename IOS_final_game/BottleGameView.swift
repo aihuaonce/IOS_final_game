@@ -112,6 +112,7 @@ struct BottleGameView: View {
             }
             .navigationTitle("幾 A 幾 B 遊戲")
             .navigationBarTitleDisplayMode(.inline)
+            .navigationBarBackButtonHidden(true)
             // MARK: - 遊戲結束畫面疊加在最上層
             if showGameOverScreen {
                 GameOverView()

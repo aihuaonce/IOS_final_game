@@ -19,12 +19,15 @@ struct PeopleGame: View {
     }
 
     var body: some View {
-        SpriteView(scene: scene)
-            .ignoresSafeArea()
-        if showPeopleGameOverScreen {
-            GameOverView()
-                .transition(.opacity)
+        ZStack {
+            SpriteView(scene: scene)
+                .ignoresSafeArea()
+            if showPeopleGameOverScreen {
+                GameOverView()
+                    .transition(.opacity)
+            }
         }
+        .navigationBarBackButtonHidden(true)
     }
 }
 

@@ -59,6 +59,7 @@ struct GameOverView: View {
 
                 Spacer()
             }
+            .navigationBarBackButtonHidden(true)
         }
     }
 }
