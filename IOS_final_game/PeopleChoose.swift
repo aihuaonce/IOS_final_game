@@ -5,49 +5,75 @@
 //  Created by 11144132 on 6/9/25.
 //
 
+//
+//  People.swift
+//  IOS_final_game
+//
+//  Created by 11144132 on 6/9/25.
+//
+
 import SwiftUI
 
 struct PeopleChoose: View {
+    // 用於儲存目前選擇的難度
+    @State private var selectedDifficulty: Difficulty?
+
     var body: some View {
-        VStack {
-            Text("房子遊戲")
-                .font(.largeTitle)
-                .padding(.bottom, 30)
+        NavigationView {
+            VStack(spacing: 20) {
+                Text("選擇難度")
+                    .font(.largeTitle)
+                    .bold()
 
-            Text("請選擇難度：")
-                .font(.headline)
-                .padding(.bottom, 20)
+                ForEach(Difficulty.allCases, id: \.self) { difficulty in
+                    Button(action: {
+                        selectedDifficulty = difficulty
+                        print("選擇了：\(difficulty.rawValue)")
+                        // 在這裡觸發下一步的邏輯，例如導向遊戲頁面
+                    }) {
+                        Text(difficulty.displayName)
+                            .font(.title2)
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .background(difficulty.color)
+                            .foregroundColor(.white)
+                            .cornerRadius(10)
+                    }
+                }
 
-            // 難度按鈕範例
-            Button("簡單") {
-                // TODO: 進入房子遊戲的簡單模式
-                print("進入房子遊戲 - 簡單模式")
+                Spacer()
             }
-            .buttonStyle(.borderedProminent)
-            .padding(.bottom, 10)
-
-            Button("中等") {
-                // TODO: 進入房子遊戲的中等模式
-                print("進入房子遊戲 - 中等模式")
-            }
-            .buttonStyle(.borderedProminent)
-            .padding(.bottom, 10)
-
-            Button("困難") {
-                // TODO: 進入房子遊戲的困難模式
-                print("進入房子遊戲 - 困難模式")
-            }
-            .buttonStyle(.borderedProminent)
+            .padding()
         }
-        .navigationTitle("房子遊戲難度")
-        .navigationBarTitleDisplayMode(.inline)
     }
 }
 
+// 難度列舉
+enum Difficulty: String, CaseIterable {
+    case easy
+    case medium
+    case hard
+
+    var displayName: String {
+        switch self {
+        case .easy: return "菜就多練"
+        case .medium: return "危"
+        case .hard: return "死"
+        }
+    }
+
+    var color: Color {
+        switch self {
+        case .easy: return .green
+        case .medium: return .orange
+        case .hard: return .red
+        }
+    }
+}
+
+// 預覽
 struct PeopleChoose_Previews: PreviewProvider {
     static var previews: some View {
-        NavigationView {
-            PeopleChoose()
-        }
+        PeopleChoose()
     }
 }
