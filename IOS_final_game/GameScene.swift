@@ -13,21 +13,22 @@
 
 import SpriteKit
 import GameplayKit
+import SwiftUI
 
 // ✅ Singleton with difficulty & time
 class GameSettings {
     static let shared = GameSettings()
-
+    
     var difficulty: PeopleGameDifficulty = .easy
     var gameTime: Int = 30
-
+    
     private init() {}
 }
 
 // ✅ 遊戲邏輯使用的難度等級
 enum DifficultyLevel: String {
     case easy, medium, hard
-
+    
     var spawnInterval: TimeInterval {
         switch self {
         case .easy: return 2.5
@@ -35,7 +36,7 @@ enum DifficultyLevel: String {
         case .hard: return 0.8
         }
     }
-
+    
     var moveDuration: TimeInterval {
         switch self {
         case .easy: return 4.5
@@ -46,6 +47,7 @@ enum DifficultyLevel: String {
 }
 
 class GameScene: SKScene {
+
     private var houseNode: SKLabelNode!
     private var timerLabel: SKLabelNode!
     private var peopleCounter = 0
@@ -59,53 +61,64 @@ class GameScene: SKScene {
     private var plusButton: SKLabelNode!
     private var minusButton: SKLabelNode!
     private var gameEnded = false
-
+    
+    @Binding var showPeopleGameOverScreen: Bool
+    
+    init(size: CGSize, showPeopleGameOverScreen: Binding<Bool>) {
+            self._showPeopleGameOverScreen = showPeopleGameOverScreen
+            super.init(size: size)
+        }
+    
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     override func didMove(to view: SKView) {
         backgroundColor = .white
-
+        
         if let diff = DifficultyLevel(rawValue: GameSettings.shared.difficulty.rawValue) {
             self.difficulty = diff
         }
         self.gameTime = GameSettings.shared.gameTime
-
+        
         setupUI()
         startGame()
     }
-
+    
     private func setupUI() {
         houseNode = SKLabelNode(text: "🏠")
         houseNode.fontSize = 50
         houseNode.position = CGPoint(x: size.width / 2, y: size.height * 0.75)
         addChild(houseNode)
-
+        
         timerLabel = SKLabelNode(fontNamed: "AvenirNext-Bold")
         timerLabel.fontSize = 28
         timerLabel.fontColor = .black
         timerLabel.position = CGPoint(x: size.width / 2, y: size.height - 50)
         timerLabel.text = "Time: \(gameTime)"
         addChild(timerLabel)
-
+        
         inputLabel = SKLabelNode(fontNamed: "Courier")
         inputLabel.fontSize = 32
         inputLabel.fontColor = .black
         inputLabel.text = "0"
         inputLabel.position = CGPoint(x: size.width / 2, y: size.height * 0.25)
         addChild(inputLabel)
-
+        
         plusButton = SKLabelNode(text: "+")
         plusButton.fontSize = 36
         plusButton.fontColor = .green
         plusButton.position = CGPoint(x: inputLabel.position.x + 80, y: inputLabel.position.y)
         plusButton.name = "plus"
         addChild(plusButton)
-
+        
         minusButton = SKLabelNode(text: "-")
         minusButton.fontSize = 36
         minusButton.fontColor = .red
         minusButton.position = CGPoint(x: inputLabel.position.x - 80, y: inputLabel.position.y)
         minusButton.name = "minus"
         addChild(minusButton)
-
+        
         submitButton = SKLabelNode(text: "提交")
         submitButton.fontSize = 28
         submitButton.fontColor = .blue
@@ -114,7 +127,7 @@ class GameScene: SKScene {
         submitButton.isHidden = true
         addChild(submitButton)
     }
-
+    
     private func startGame() {
         timerLabel.text = "Time: \(gameTime)"
         timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { _ in
@@ -126,23 +139,23 @@ class GameScene: SKScene {
                 self.submitButton.isHidden = false
             }
         }
-
+        
         spawnTimer = Timer.scheduledTimer(withTimeInterval: difficulty.spawnInterval, repeats: true) { _ in
             self.spawnCharacters()
         }
     }
-
+    
     private func spawnCharacters() {
         let types = ["🐱", "🐶", "👨", "👩"]
         let count = Int.random(in: 1...3)
         var usedFrames: [CGRect] = []
-
+        
         for _ in 0..<count {
             let emoji = types.randomElement()!
             let label = SKLabelNode(text: emoji)
             label.fontSize = 36
             label.name = emoji
-
+            
             var position: CGPoint
             var attempts = 0
             repeat {
@@ -154,11 +167,11 @@ class GameScene: SKScene {
                 usedFrames.contains(where: { $0.contains(position) }) ||
                 distance(from: position, to: houseNode.position) < 100
             ) && attempts < 20
-
+            
             label.position = position
             usedFrames.append(label.frame)
             addChild(label)
-
+            
             let move = SKAction.move(to: houseNode.position, duration: difficulty.moveDuration)
             let countAction = SKAction.run {
                 if emoji == "👨" || emoji == "👩" {
@@ -169,10 +182,10 @@ class GameScene: SKScene {
             label.run(SKAction.sequence([move, countAction, remove]))
         }
     }
-
+    
     private func endGameCheck() {
         gameEnded = true
-
+        
         let result = (inputNumber == peopleCounter) ? "✅ 答對" : "❌ 答錯"
         let resultLabel = SKLabelNode(fontNamed: "AvenirNext-Bold")
         resultLabel.text = result
@@ -180,14 +193,14 @@ class GameScene: SKScene {
         resultLabel.fontColor = .black
         resultLabel.position = CGPoint(x: size.width / 2, y: size.height / 2)
         addChild(resultLabel)
-
+        
         for _ in 0..<peopleCounter {
             let emoji = ["👨", "👩"].randomElement()!
             let sprite = SKLabelNode(text: emoji)
             sprite.fontSize = 36
             sprite.position = houseNode.position
             addChild(sprite)
-
+            
             let angle = CGFloat.random(in: 0...CGFloat.pi * 2)
             let dx = cos(angle) * 100
             let dy = sin(angle) * 100
@@ -195,14 +208,17 @@ class GameScene: SKScene {
             let remove = SKAction.removeFromParent()
             sprite.run(SKAction.sequence([move, remove]))
         }
-
+        
         peopleCounter = 0
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+            self.$showPeopleGameOverScreen.wrappedValue = true
+        }
     }
-
+    
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
         guard let location = touches.first?.location(in: self) else { return }
         let tappedNodes = nodes(at: location)
-
+        
         for node in tappedNodes {
             switch node.name {
             case "plus":
@@ -220,7 +236,7 @@ class GameScene: SKScene {
             }
         }
     }
-
+    
     // ✅ 加入距離計算
     private func distance(from: CGPoint, to: CGPoint) -> CGFloat {
         return hypot(from.x - to.x, from.y - to.y)

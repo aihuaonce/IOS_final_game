@@ -9,8 +9,11 @@ import SwiftUI
 import SpriteKit
 
 struct PeopleGame: View {
+    @State private var showPeopleGameOverScreen: Bool = false
     var scene: SKScene {
-        let scene = GameScene(size: UIScreen.main.bounds.size)
+        let scene = GameScene(
+            size: UIScreen.main.bounds.size,
+            showPeopleGameOverScreen: $showPeopleGameOverScreen)
         scene.scaleMode = .resizeFill
         return scene
     }
@@ -18,6 +21,10 @@ struct PeopleGame: View {
     var body: some View {
         SpriteView(scene: scene)
             .ignoresSafeArea()
+        if showPeopleGameOverScreen {
+            GameOverView()
+                .transition(.opacity)
+        }
     }
 }
 
