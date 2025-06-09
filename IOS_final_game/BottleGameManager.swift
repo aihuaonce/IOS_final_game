@@ -32,11 +32,11 @@ class GameManager: ObservableObject {
         }
 
         // 生成秘密序列，長度就是 numberOfValue
-        var tempColors = availableColors.shuffled()
+        let tempColors = availableColors.shuffled()
         self.secretSequence = Array(tempColors.prefix(numberOfValue))
         
         // 生成玩家初始序列，長度也是 numberOfValue
-        var initialPlayerColors = tempColors.shuffled() // 再次打亂，確保和秘密序列不同
+        let initialPlayerColors = tempColors.shuffled() // 再次打亂，確保和秘密序列不同
         self.playerSequence = Array(initialPlayerColors.prefix(numberOfValue))
 
         print("秘密序列 (位數: \(numberOfValue)): \(secretSequence.map { $0.rawValue })")

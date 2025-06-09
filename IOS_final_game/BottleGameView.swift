@@ -1,8 +1,8 @@
 //
-//  BottleGameView.swift
-//  IOS_final_game
+//   BottleGameView.swift
+//   IOS_final_game
 //
-//  Created by 11144137 on 2025/6/9.
+//   Created by 11144137 on 2025/6/9.
 //
 
 import SwiftUI
@@ -39,7 +39,8 @@ struct BottleGameView: View {
     
     @State private var gameMessage: String = "請交換方塊來猜測順序。"
     @State private var hasGuessed: Bool = false
-    
+    @State private var correctSequenceForHeader: [CupColor]? = nil
+
     init(numberOfCups: Int) {
         self.numberOfCups = numberOfCups
         _gameManager = StateObject(wrappedValue: GameManager(numberOfValue: numberOfCups))
@@ -49,8 +50,8 @@ struct BottleGameView: View {
         VStack(spacing: 0) {
             // MARK: - 使用 GameHeaderView 來替換上半部複雜的 View 結構
             // 透過 $gameMessage 將 gameMessage 的 Binding 傳遞給 GameHeaderView
-            GameHeaderView(gameMessage: $gameMessage)
-            
+            GameHeaderView(gameMessage: $gameMessage, correctSequenceToDisplay: correctSequenceForHeader)
+
             // MARK: - 分隔線 (模擬木板)
             Rectangle()
                 .fill(Color.brown)
@@ -65,8 +66,10 @@ struct BottleGameView: View {
                 Text("你的順序")
                     .font(.largeTitle)
                     .padding(.bottom, 30)
+                    .padding(.top, 20)
                 
-                Spacer()
+                Spacer() // 這邊的 Spacer 可以放在 cup view 上方，或放在整個 VStack 的最後面
+                
                 // --- 根據總杯子數量，平均分兩列 ---
                 let totalCups = gameManager.playerSequence.count
                 // 計算第一列的杯子數量 (總數除以 2，無條件進位)
@@ -107,15 +110,16 @@ struct BottleGameView: View {
                     .padding(.horizontal)
                 }
                 
-                Spacer()
+                Spacer() // 將內容推向上方，提供底部空間
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(Color.green.opacity(0.2))
         }
         .navigationTitle("幾 A 幾 B 遊戲")
         .navigationBarTitleDisplayMode(.inline)
-    }
+    } // <-- body 的結束括號
     
+    // MARK: - handleCupTap 函式必須定義在 struct 內部
     private func handleCupTap(at index: Int) {
         if firstSelectedIndex == nil {
             firstSelectedIndex = index
@@ -134,13 +138,20 @@ struct BottleGameView: View {
             
             if result.A == gameManager.secretSequence.count {
                 gameMessage = "恭喜！\n你答對了！"
+                
+                withAnimation(.easeInOut(duration: 0.5)) {
+                    self.correctSequenceForHeader = gameManager.secretSequence // 將正確序列傳給 GameHeaderView
+                }
             }
+            
         }
     }
 }
 // 預覽功能
 struct BottleGameView_Previews: PreviewProvider {
     static var previews: some View {
-        BottleGameView(numberOfCups: 9)
+        Group {
+            BottleGameView(numberOfCups: 4)
+        }
     }
 }

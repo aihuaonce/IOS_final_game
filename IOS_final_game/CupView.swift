@@ -7,17 +7,35 @@
 
 import SwiftUI
 
+extension CupColor {
+    var localizedName: String {
+        switch self {
+        case .red: return "紅色"
+        case .blue: return "藍色"
+        case .green: return "綠色"
+        case .yellow: return "黃色"
+        case .orange: return "橘色"
+        case .purple: return "紫色"
+        case .cyan: return "青色"
+        case .magenta: return "洋紅色"
+        case .brown: return "棕色"
+        case .white: return "白色"
+        }
+    }
+}
+
 struct CupView: View {
     let color: CupColor
-    let isTarget: Bool
+    let isTarget: Bool // 這個屬性現在用來區分：true 為正確順序杯子，false 為玩家杯子
     var isSelected: Bool = false
+    var customSize: CGSize? // 新增：可選的自訂尺寸
 
     var body: some View {
         ZStack {
             RoundedRectangle(cornerRadius: 10)
                 .fill(color.swiftUIColor)
-                .frame(width: 60, height: 80)
-                .shadow(radius: isTarget ? 0 : 2)
+                // 根據 customSize 或預設值設定尺寸
+                .frame(width: customSize?.width ?? 60, height: customSize?.height ?? 80)
                 .overlay(
                     RoundedRectangle(cornerRadius: 10)
                         .stroke(Color.black.opacity(0.3), lineWidth: 1)
