@@ -24,9 +24,8 @@ struct ContentView: View {
                     .fontWeight(.bold)
                     .foregroundColor(.blue)
                     .padding(.bottom, 50)
-
                 // 瓶子按鈕
-                NavigationLink(destination: Text("瓶子遊戲難度選擇頁面")) {
+                NavigationLink(destination: BottleChoose()) {
                     Text("瓶子")
                         .font(.title2)
                         .fontWeight(.semibold)
@@ -45,7 +44,7 @@ struct ContentView: View {
                 .padding(.bottom, 20)
 
                 // 房子按鈕
-                NavigationLink(destination: Text("房子遊戲難度選擇頁面")) {
+                NavigationLink(destination: PeopleChoose()) {
                     Text("房子")
                         .font(.title2)
                         .fontWeight(.semibold)
