@@ -4,11 +4,17 @@
 //
 //  Created by 11144155 on 2025/6/9.
 //
+//
+//  GameScene.swift
+//  IOS_final_game
+//
+//  Created by 11144155 on 2025/6/9.
+//
 
 import SpriteKit
 import GameplayKit
 
-// ✅ Singleton with renamed enum type
+// ✅ Singleton with difficulty & time
 class GameSettings {
     static let shared = GameSettings()
 
@@ -18,22 +24,23 @@ class GameSettings {
     private init() {}
 }
 
+// ✅ 遊戲邏輯使用的難度等級
 enum DifficultyLevel: String {
     case easy, medium, hard
 
     var spawnInterval: TimeInterval {
         switch self {
-        case .easy: return 2.0
-        case .medium: return 1.0
-        case .hard: return 0.5
+        case .easy: return 2.5
+        case .medium: return 1.8
+        case .hard: return 0.8
         }
     }
 
     var moveDuration: TimeInterval {
         switch self {
-        case .easy: return 4.0
-        case .medium: return 2.5
-        case .hard: return 1.2
+        case .easy: return 4.5
+        case .medium: return 2.8
+        case .hard: return 1.8
         }
     }
 }
@@ -56,7 +63,6 @@ class GameScene: SKScene {
     override func didMove(to view: SKView) {
         backgroundColor = .white
 
-        // ✅ 使用 PeopleGameDifficulty
         if let diff = DifficultyLevel(rawValue: GameSettings.shared.difficulty.rawValue) {
             self.difficulty = diff
         }
@@ -144,7 +150,10 @@ class GameScene: SKScene {
                 let y = CGFloat.random(in: size.height / 2...(size.height - 80))
                 position = CGPoint(x: x, y: y)
                 attempts += 1
-            } while usedFrames.contains(where: { $0.contains(position) }) && attempts < 10
+            } while (
+                usedFrames.contains(where: { $0.contains(position) }) ||
+                distance(from: position, to: houseNode.position) < 100
+            ) && attempts < 20
 
             label.position = position
             usedFrames.append(label.frame)
@@ -172,7 +181,7 @@ class GameScene: SKScene {
         resultLabel.position = CGPoint(x: size.width / 2, y: size.height / 2)
         addChild(resultLabel)
 
-        for _ in 0..<6 {
+        for _ in 0..<peopleCounter {
             let emoji = ["👨", "👩"].randomElement()!
             let sprite = SKLabelNode(text: emoji)
             sprite.fontSize = 36
@@ -210,5 +219,10 @@ class GameScene: SKScene {
                 break
             }
         }
+    }
+
+    // ✅ 加入距離計算
+    private func distance(from: CGPoint, to: CGPoint) -> CGFloat {
+        return hypot(from.x - to.x, from.y - to.y)
     }
 }
