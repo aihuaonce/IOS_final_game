@@ -6,8 +6,14 @@
 //
 
 import SwiftUI
+import AVFoundation
 
 struct ContentView: View {
+    @State private var showSettings = false
+    @State private var soundEffectPlayer: AVAudioPlayer?
+
+    @AppStorage("soundVolume") var soundVolume: Double = 0.7
+
     var body: some View {
         NavigationView {
             VStack {
@@ -19,7 +25,8 @@ struct ContentView: View {
                     .foregroundColor(.blue)
                     .padding(.bottom, 50)
 
-                NavigationLink(destination: BottleChoose()) {
+                // 瓶子按鈕
+                NavigationLink(destination: Text("瓶子遊戲難度選擇頁面")) {
                     Text("瓶子")
                         .font(.title2)
                         .fontWeight(.semibold)
@@ -31,9 +38,14 @@ struct ContentView: View {
                                 .stroke(Color.black, lineWidth: 2)
                         )
                 }
+                .simultaneousGesture(TapGesture().onEnded {
+                    print("點擊了瓶子！")
+                    playSoundEffect(soundFileName: "sound", fileExtension: "mp3")
+                })
                 .padding(.bottom, 20)
 
-                NavigationLink(destination: PeopleChoose()) {
+                // 房子按鈕
+                NavigationLink(destination: Text("房子遊戲難度選擇頁面")) {
                     Text("房子")
                         .font(.title2)
                         .fontWeight(.semibold)
@@ -45,11 +57,56 @@ struct ContentView: View {
                                 .stroke(Color.black, lineWidth: 2)
                         )
                 }
+                .simultaneousGesture(TapGesture().onEnded {
+                    print("點擊了房子！")
+                    playSoundEffect(soundFileName: "sound", fileExtension: "mp3")
+                })
 
                 Spacer()
             }
-            .navigationBarHidden(true)
+            .contentShape(Rectangle())
+            .onTapGesture {
+                print("點擊了空白區域！")
+                playSoundEffect(soundFileName: "sound", fileExtension: "mp3")
+            }
             .navigationTitle("")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button(action: {
+                        showSettings = true
+                        print("點擊了設定按鈕！")
+                        playSoundEffect(soundFileName: "sound", fileExtension: "mp3")
+                    }) {
+                        Image(systemName: "line.horizontal.3")
+                            .font(.title2)
+                            .foregroundColor(.black)
+                    }
+                }
+            }
+        }
+        .sheet(isPresented: $showSettings) {
+            SettingsView()
+        }
+        .onChange(of: soundVolume) { _, newVolume in
+            soundEffectPlayer?.volume = Float(newVolume)
+        }
+    }
+
+    func playSoundEffect(soundFileName: String, fileExtension: String) {
+        print("playSoundEffect() 嘗試播放 \(soundFileName).\(fileExtension)")
+        guard let url = Bundle.main.url(forResource: soundFileName, withExtension: fileExtension) else {
+            print("音效檔案 \(soundFileName).\(fileExtension) 未找到")
+            return
+        }
+
+        do {
+            soundEffectPlayer = try AVAudioPlayer(contentsOf: url)
+            soundEffectPlayer?.volume = Float(soundVolume)
+            soundEffectPlayer?.play()
+            print("音效 \(soundFileName) 播放中，音量：\(soundEffectPlayer?.volume ?? -1)")
+        } catch {
+            print("無法初始化音效播放器: \(error.localizedDescription)")
         }
     }
 }
