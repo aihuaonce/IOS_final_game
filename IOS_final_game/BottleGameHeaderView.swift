@@ -44,7 +44,7 @@ struct GameHeaderView: View {
                         Triangle()
                             .fill(Color.white)
                             .frame(width: 25, height: 20) // 箭頭也稍微放大
-                            .rotationEffect(.degrees(90))
+                            .rotationEffect(.degrees(180))
                             .offset(x: -15, y: 0) // 微調箭頭位置
                         , alignment: .leading
                     )
