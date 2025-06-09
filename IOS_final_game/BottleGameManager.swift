@@ -5,38 +5,32 @@
 //  Created by 11144137 on 2025/6/9.
 //
 
-import Foundation // 引入 Foundation 框架
+import Foundation
 
-// 檢查結果的 struct
 struct GuessResult {
-    let A: Int // 數字和位置都正確的數量
-    let B: Int // 數字正確但位置不正確的數量
+    let A: Int
+    let B: Int
 }
 
-// GameManager 負責遊戲的狀態和核心邏輯
 class GameManager: ObservableObject {
     @Published var secretSequence: [CupColor]
     @Published var playerSequence: [CupColor]
 
-    private let numberOfValue: Int // 將 numberOfCups 更名為 numberOfValue，以符合上下文
+    private let numberOfValue: Int
 
-    // 修改 init 參數名稱以匹配
     init(numberOfValue: Int) {
-        self.numberOfValue = numberOfValue // 現在 numberOfValue 就是遊戲的位數
+        self.numberOfValue = numberOfValue
 
-        // 確保從 CupColor 中至少有足夠的顏色可以用來生成序列
         let availableColors = Array(CupColor.allCases.prefix(numberOfValue))
         
         guard availableColors.count >= numberOfValue else {
             fatalError("CupColor 的數量不足以支援選擇的難度 \(numberOfValue)")
         }
 
-        // 生成秘密序列，長度就是 numberOfValue
         let tempColors = availableColors.shuffled()
         self.secretSequence = Array(tempColors.prefix(numberOfValue))
         
-        // 生成玩家初始序列，長度也是 numberOfValue
-        let initialPlayerColors = tempColors.shuffled() // 再次打亂，確保和秘密序列不同
+        let initialPlayerColors = tempColors.shuffled() 
         self.playerSequence = Array(initialPlayerColors.prefix(numberOfValue))
 
         print("秘密序列 (位數: \(numberOfValue)): \(secretSequence.map { $0.rawValue })")

@@ -69,7 +69,6 @@ struct BottleChoose: View {
 
                 Spacer()
 
-                // --- 修改這裡的 NavigationLink ---
                 NavigationLink(destination: BottleGameView(numberOfCups: selectedNumberOfCups ?? 6)) {
                     Text("開始遊戲")
                         .font(.title2)
@@ -90,7 +89,6 @@ struct BottleChoose: View {
     }
 }
 
-// DifficultyButton 保持不變
 struct DifficultyButton: View {
     let numberOfCups: Int
     let isSelected: Bool
@@ -113,7 +111,6 @@ struct DifficultyButton: View {
     }
 }
 
-// 預覽
 struct DifficultySelectionView_Previews: PreviewProvider {
     static var previews: some View {
         BottleChoose()

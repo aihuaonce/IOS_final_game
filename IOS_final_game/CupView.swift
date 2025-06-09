@@ -26,15 +26,14 @@ extension CupColor {
 
 struct CupView: View {
     let color: CupColor
-    let isTarget: Bool // 這個屬性現在用來區分：true 為正確順序杯子，false 為玩家杯子
+    let isTarget: Bool
     var isSelected: Bool = false
-    var customSize: CGSize? // 新增：可選的自訂尺寸
+    var customSize: CGSize?
 
     var body: some View {
         ZStack {
             RoundedRectangle(cornerRadius: 10)
                 .fill(color.swiftUIColor)
-                // 根據 customSize 或預設值設定尺寸
                 .frame(width: customSize?.width ?? 60, height: customSize?.height ?? 80)
                 .overlay(
                     RoundedRectangle(cornerRadius: 10)

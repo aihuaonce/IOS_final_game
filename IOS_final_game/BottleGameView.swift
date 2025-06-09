@@ -7,13 +7,11 @@
 
 import SwiftUI
 
-// 用來表示杯子的顏色。你可以擴展這個 enum 加入更多顏色。
 enum CupColor: String, CaseIterable, Identifiable {
     case red, blue, green, yellow, orange, purple, cyan, magenta, brown, white
     
     var id: String { self.rawValue }
     
-    // 方便顯示顏色的 View
     var swiftUIColor: Color {
         switch self {
         case .red: return .red
@@ -30,7 +28,6 @@ enum CupColor: String, CaseIterable, Identifiable {
     }
 }
 
-// BottleGameView 的主要結構
 struct BottleGameView: View {
     let numberOfCups: Int
     
@@ -49,7 +46,6 @@ struct BottleGameView: View {
     var body: some View {
         VStack(spacing: 0) {
             // MARK: - 使用 GameHeaderView 來替換上半部複雜的 View 結構
-            // 透過 $gameMessage 將 gameMessage 的 Binding 傳遞給 GameHeaderView
             GameHeaderView(gameMessage: $gameMessage, correctSequenceToDisplay: correctSequenceForHeader)
 
             // MARK: - 分隔線 (模擬木板)
@@ -68,18 +64,14 @@ struct BottleGameView: View {
                     .padding(.bottom, 30)
                     .padding(.top, 20)
                 
-                Spacer() // 這邊的 Spacer 可以放在 cup view 上方，或放在整個 VStack 的最後面
+                Spacer()
                 
-                // --- 根據總杯子數量，平均分兩列 ---
                 let totalCups = gameManager.playerSequence.count
-                // 計算第一列的杯子數量 (總數除以 2，無條件進位)
                 let firstRowItemCount = (totalCups + 1) / 2
                 
                 let firstRowCups = Array(gameManager.playerSequence.prefix(firstRowItemCount))
                 let secondRowCups = Array(gameManager.playerSequence.suffix(max(0, totalCups - firstRowItemCount)))
-                // --- 根據總杯子數量，平均分兩列 ---
                 
-                // 第一列
                 HStack(spacing: 15) {
                     ForEach(firstRowCups.indices, id: \.self) { indexInRow in
                         let actualIndex = indexInRow
@@ -92,13 +84,12 @@ struct BottleGameView: View {
                     }
                 }
                 .padding(.horizontal)
-                .padding(.bottom, !secondRowCups.isEmpty ? 5 : 0) // 如果有第二行，則加上底部間距
+                .padding(.bottom, !secondRowCups.isEmpty ? 5 : 0)
                 
-                // 第二列 (只有當有第二列的杯子時才顯示)
                 if !secondRowCups.isEmpty {
                     HStack(spacing: 15) {
                         ForEach(secondRowCups.indices, id: \.self) { indexInRow in
-                            let actualIndex = indexInRow + firstRowItemCount // 第二列的實際索引需要加上第一列的數量
+                            let actualIndex = indexInRow + firstRowItemCount
                             CupView(color: secondRowCups[indexInRow],
                                     isTarget: false,
                                     isSelected: self.firstSelectedIndex == actualIndex)
@@ -110,16 +101,16 @@ struct BottleGameView: View {
                     .padding(.horizontal)
                 }
                 
-                Spacer() // 將內容推向上方，提供底部空間
+                Spacer()
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(Color.green.opacity(0.2))
         }
         .navigationTitle("幾 A 幾 B 遊戲")
         .navigationBarTitleDisplayMode(.inline)
-    } // <-- body 的結束括號
+    }
     
-    // MARK: - handleCupTap 函式必須定義在 struct 內部
+    // MARK: - handleCupTap
     private func handleCupTap(at index: Int) {
         if firstSelectedIndex == nil {
             firstSelectedIndex = index
@@ -140,18 +131,18 @@ struct BottleGameView: View {
                 gameMessage = "恭喜！\n你答對了！"
                 
                 withAnimation(.easeInOut(duration: 0.5)) {
-                    self.correctSequenceForHeader = gameManager.secretSequence // 將正確序列傳給 GameHeaderView
+                    self.correctSequenceForHeader = gameManager.secretSequence
                 }
             }
             
         }
     }
 }
-// 預覽功能
+
 struct BottleGameView_Previews: PreviewProvider {
     static var previews: some View {
         Group {
-            BottleGameView(numberOfCups: 4)
+            BottleGameView(numberOfCups: 6)
         }
     }
 }
